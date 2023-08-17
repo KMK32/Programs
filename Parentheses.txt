@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+// Define a structure for a stack node
+struct StackNode {
+    char data;
+    struct StackNode* next;
+};
+
+typedef struct StackNode StackNode;
+
+// Function to create a new stack node
+StackNode* createStackNode(char data) {
+    StackNode* newNode = (StackNode*)malloc(sizeof(StackNode));
+    if (newNode == NULL) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to push a character onto the stack
+void push(StackNode** top, char data) {
+    StackNode* newNode = createStackNode(data);
+    newNode->next = *top;
+    *top = newNode;
+}
+
+// Function to pop a character from the stack
+char pop(StackNode** top) {
+    if (*top == NULL) {
+        printf("Stack is empty\n");
+        exit(1);
+    }
+
+    StackNode* temp = *top;
+    char data = temp->data;
+    *top = (*top)->next;
+    free(temp);
+    return data;
+}
+
+// Function to check if parentheses are balanced in an expression
+bool areParenthesesBalanced(const char* expression) {
+    StackNode* stack = NULL;
+
+    for (int i = 0; expression[i] != '\0'; i++) {
+        char ch = expression[i];
+
+        if (ch == '(' || ch == '{' || ch == '[') {
+            push(&stack, ch);
+        } else if (ch == ')' || ch == '}' || ch == ']') {
+            if (stack == NULL) {
+                return false;
+            }
+
+            char top = pop(&stack);
+
+            if ((ch == ')' && top != '(') ||
+                (ch == '}' && top != '{') ||
+                (ch == ']' && top != '[')) {
+                return false;
+            }
+        }
+    }
+
+    return stack == NULL;
+}
+
+int main() {
+    char expression[100];
+
+    printf("Enter an expression: ");
+    scanf("%s", expression);
+
+    if (areParenthesesBalanced(expression)) {
+        printf("Parentheses are balanced.\n");
+    } else {
+        printf("Parentheses are not balanced.\n");
+    }
+
+return 0;
+}
